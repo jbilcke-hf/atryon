@@ -11,7 +11,7 @@ export function useSettings() {
 
   // DEFAULT: default engine
   // GRADIO_API: url to local or remote gradio spaces
-  // CUSTOM_REPLICATE: url to replicate api(s)
+  // REPLICATE: url to replicate api(s)
   const [engine, setEngine] = useState<Engine>(defaultSettings.engine)
 
   // api key of the Hugging Face account
@@ -75,7 +75,7 @@ export function useSettings() {
 
   useEffect(() => {
     // Restores state using the preferences stored in chrome.storage.
-    chrome.storage.sync.get(
+    chrome.storage.local.get(
       getDefaultSettings(),
       (settings) => {
         setEngine(settings.engine)
@@ -112,8 +112,8 @@ export function useSettings() {
 
   const saveSettings = () => {
     setStatus("saving")
-    // Saves options to chrome.storage.sync.
-    chrome.storage.sync.set(
+    // Saves options to chrome.storage.local.
+    chrome.storage.local.set(
       {
         engine,
 
@@ -157,12 +157,43 @@ export function useSettings() {
     )
   }
 
+  useEffect(() => {
+    console.log(`autosave settings..`)
+    saveSettings()
+  }, [
+    engine,
+    huggingfaceApiKey,
+    huggingfaceSegmentationSpaceUrl,
+    huggingfaceSubstitutionSpaceUrl,
+    huggingfaceNumberOfSteps,
+    huggingfaceGuidanceScale,
+    replicateApiKey,
+    replicateSegmentationModel,
+    replicateSegmentationModelVersion,
+    replicateSubstitutionModel,
+    replicateSubstitutionModelVersion,
+    replicateNumberOfSteps,
+    replicateGuidanceScale,
+    customGradioApiKey,
+    customGradioApiSegmentationSpaceUrl,
+    customGradioApiSubstitutionSpaceUrl,
+    customGradioApiNumberOfSteps,
+    customGradioApiGuidanceScale,
+    upperBodyModelImage,
+    upperBodyModelMaskImage,
+    fullBodyModelImage,
+    fullBodyModelMaskImage,
+    isEnabled,
+  ])
+
   return {
     defaultSettings,
     
     status, setStatus,
 
-    // engine (HUGGINGFACE, REPLICATE or LOCALHOST)
+    // DEFAULT: default engine
+    // GRADIO_API: url to local or remote gradio spaces
+    // REPLICATE: url to replicate api(s)
     engine, setEngine,
 
     // api key of the Hugging Face account
@@ -218,13 +249,7 @@ export function useSettings() {
     fullBodyModelMaskImage, setFullBodyModelMaskImage,
 
     // to enable or disable the substitution
-    isEnabled,
-    
-    // only needf for setEnabled which is often called
-    setEnabled: (newValue: boolean) => {
-      setEnabled(newValue)
-      saveSettings()
-    },
+    isEnabled, setEnabled,
 
     // trigger to save the options
     saveSettings,

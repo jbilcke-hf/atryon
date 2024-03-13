@@ -70,7 +70,7 @@ const mainLoop = async () => {
     image.status !== 'invalid'
   )
 
-	const settings = await chrome.storage.sync.get(getDefaultSettings()) as Settings
+	const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
   for (let image of unprocessedImages) {
     console.log(`background.ts: asking API to replace this image: ${image.originalUri}`)

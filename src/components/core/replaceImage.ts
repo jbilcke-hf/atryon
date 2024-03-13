@@ -4,10 +4,10 @@ import { replaceImage as replaceImageWithReplicate } from "../../providers/repli
 import { replaceImage as replaceImageWithHuggingface } from "../../providers/huggingface"
 
 export const replaceImage: ImageReplacer = async (params) => {
-  const settings = await chrome.storage.sync.get(getDefaultSettings()) as Settings
+  const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
   const fn: ImageReplacer =
-    settings.engine === "CUSTOM_REPLICATE"
+    settings.engine === "REPLICATE"
     ? replaceImageWithReplicate
     : replaceImageWithHuggingface
   

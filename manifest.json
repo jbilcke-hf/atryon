@@ -25,6 +25,7 @@
     "bookmarks",
     "tabs",
     "storage",
+    "unlimitedStorage",
     "history"
   ]
 }

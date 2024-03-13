@@ -2,7 +2,7 @@ import { ImageReplacer, ImageSegmenter, Settings } from "@/types"
 import { getDefaultSettings } from "@/utils/getDefaultSettings"
 
 export const replaceImage: ImageReplacer = async (modelImage) => {
-  const settings = await chrome.storage.sync.get(getDefaultSettings()) as Settings
+  const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
   if (settings.engine !== "DEFAULT" && settings.engine !== "GRADIO_API") {
     throw new Error(`segmentImage(): can only be used with the DEFAULT or GRADIO_API engine`)
@@ -60,7 +60,7 @@ export const replaceImage: ImageReplacer = async (modelImage) => {
 }
 
 export const segmentImage: ImageSegmenter = async (modelImage) => {
-  const settings = await chrome.storage.sync.get(getDefaultSettings()) as Settings
+  const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
   if (settings.engine !== "DEFAULT" && settings.engine !== "GRADIO_API") {
     throw new Error(`segmentImage(): can only be used with the DEFAULT or GRADIO_API engine`)
@@ -96,7 +96,8 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
     ]
   }
 
-  console.log(`segmentImage(): calling fetch(${gradioUrl}, ${JSON.stringify(params, null, 2)})`)
+  //console.log(`segmentImage(): calling fetch(${gradioUrl}, ${JSON.stringify(params, null, 2)})`)
+  
   const res = await fetch(gradioUrl, {
     method: "POST",
     headers: {
@@ -108,7 +109,7 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
   })
 
   const { data } = await res.json()
-  console.log(`segmentImage:(): data = `, data)
+
   if (res.status !== 200 || !Array.isArray(data)) {
     // This will activate the closest `error.js` Error Boundary
     throw new Error(`Failed to fetch data (status: ${res.status})`)
@@ -117,6 +118,22 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
   if (!data[0]) {
     throw new Error(`the returned image was empty`)
   }
+  
+  const {
+    face_mask,
+    mask,
+    model_mask,
+    model_parse,
+    original_image
+  } = data[0] as {
+    face_mask: string
+    mask: string
 
-  return data[0] as string
+    // this represents the original image, minus the garment (which will become gray)
+    model_mask: string
+    model_parse: string
+    original_image: string
+  }
+
+  return mask
 }

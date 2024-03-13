@@ -1,7 +1,7 @@
 export type Engine =
   | "DEFAULT" // default engine
   | "GRADIO_API" // url to local or remote gradio spaces
-  | "CUSTOM_REPLICATE" // url to replicate api(s)
+  | "REPLICATE" // url to replicate api(s)
 
 export type SettingsSaveStatus =
   | "idle"
@@ -72,7 +72,7 @@ export type PredictionReplaceImageWithReplicate = {
 export type Settings = {
   // DEFAULT: default engine
   // GRADIO_API: url to local or remote gradio spaces
-  // CUSTOM_REPLICATE: url to replicate api(s)
+  // REPLICATE: url to replicate api(s)
   engine: Engine
 
   // --------------- HUGGING FACE ----------------------------

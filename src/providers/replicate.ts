@@ -4,10 +4,10 @@ import { getDefaultSettings } from "@/utils/getDefaultSettings"
 
 
 export const segmentImage: ImageSegmenter = async (modelImage) => {
-  const settings = await chrome.storage.sync.get(getDefaultSettings()) as Settings
+  const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
-  if (settings.engine !== "CUSTOM_REPLICATE") {
-    throw new Error(`segmentImage(): can only be used with the CUSTOM_REPLICATE engine`)
+  if (settings.engine !== "REPLICATE") {
+    throw new Error(`segmentImage(): can only be used with the REPLICATE engine`)
   }
 
   if (!modelImage) {
@@ -100,10 +100,10 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
 }
 
 export const replaceImage: ImageReplacer = async ({ garmentImage, modelImage }) => {
-  const settings = await chrome.storage.sync.get(getDefaultSettings()) as Settings
+  const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
-  if (settings.engine !== "CUSTOM_REPLICATE") {
-    throw new Error(`replaceImage(): can only be used with the CUSTOM_REPLICATE engine`)
+  if (settings.engine !== "REPLICATE") {
+    throw new Error(`replaceImage(): can only be used with the REPLICATE engine`)
   }
 
   if (!garmentImage) {

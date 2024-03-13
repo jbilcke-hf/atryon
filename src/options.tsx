@@ -19,40 +19,12 @@ import { segmentImage } from "./components/core/segmentImage"
 function Options() {
   const settings = useSettings()
 
-  console.log(`this is the options panel`)
-
-  useEffect(() => {
-    console.log(`upperBodyModelImage changed:`, settings.upperBodyModelImage)
-    console.log(`calling model image segmenter on the upper body..`)
-    const fn = async () => {
-      try {
-        const segmentationResult = await segmentImage(settings.upperBodyModelImage)
-        if (!segmentationResult) { throw new Error(`segmentationResult is empty`) }
-        settings.setUpperBodyModelMaskImage(segmentationResult)
-      } catch (err) {
-        console.log(`failed to segment the upper body: `, err)
-      }
-    }
-
-    fn()
-  }, [settings.upperBodyModelImage])
+  const hasValidDefaultCredentials = settings.engine === "DEFAULT" && settings.huggingfaceApiKey
+  const hasValidCustomGradioApiCredentials = settings.engine === "GRADIO_API" && settings.customGradioApiKey
+  const hasValidReplicateCredentials = settings.engine === "REPLICATE" && settings.replicateApiKey
   
-
-   useEffect(() => {
-    console.log(`fullBodyModelImage changed:`, settings.fullBodyModelImage)
-    console.log(`calling model image segmenter on the full body..`)
-    const fn = async () => {
-      try {
-        const segmentationResult = await segmentImage(settings.fullBodyModelImage)
-        if (!segmentationResult) { throw new Error(`segmentationResult is empty`) }
-        settings.setFullBodyModelMaskImage(segmentationResult)
-      } catch (err) {
-        console.log(`failed to segment the full body: `, err)
-      }
-    }
-  
-    fn()
-  }, [settings.fullBodyModelImage])
+  const hasValidCredentials =
+    hasValidDefaultCredentials || hasValidCustomGradioApiCredentials || hasValidReplicateCredentials
 
   return (
     <div className={cn(
@@ -105,7 +77,7 @@ function Options() {
             </Field>
           </>}
 
-          {settings.engine === "CUSTOM_REPLICATE" && <>
+          {settings.engine === "REPLICATE" && <>
             <Field>
               <Label>Replicate API Token:</Label>
               <Input
@@ -208,21 +180,21 @@ function Options() {
           </>}
         </div>
 
-        <div className="flex flex-col space-y-6 bg-zinc-200 p-4 rounded-2xl shadow-lg border-1 border-zinc-700">
-          <div className="flex flex-row space-x-2 mb-2 items-center">
+        {hasValidCredentials && <div className="flex flex-col space-y-5 bg-zinc-200 p-4 rounded-2xl shadow-lg border-1 border-zinc-700">
+          <div className="flex flex-row space-x-2 items-center">
             <div className="w-8 h-8 flex flex-col items-center justify-center text-center rounded-full bg-zinc-700 text-zinc-200 text-xl font-semibold">2</div>
             <div className="text-2xl font-semibold text-zinc-700">Add pictures of yourself</div>
           </div>
 
-          <p className="text-zinc-700 text-sm">
-            Don't worry you will only have to do this once, so please take some time to make those pictures great:
+          <p className="text-zinc-700 text-base font-semibold">
+            For best results, please follow those instructions:
           </p>
 
-          <ul className="text-zinc-700 text-sm">
-            <li>- 🧍 You must be facing the camera, with arms hanging on the sides</li>
-            <li>- 💡 Picture must be well lit, with a neutral background (eg. a white wall)</li>
-            <li>- 👕 Please wear simple clothes (eg. white t-shirt, trousers)</li>
-            <li>- 📸 Picture must be crisp with good resolution (at least 1024px)</li>
+          <ul className="text-zinc-700 text-base">
+            <li><span className="text-2xl">👕</span> Wear simple clothes (eg. white t-shirt, trousers)</li>
+            <li><span className="text-2xl">🧍</span> Face the camera, with arms hanging on the sides</li>
+            <li><span className="text-2xl">💡</span> Go outside or in well lit room, with a neutral background (eg. white walls)</li>
+            <li><span className="text-2xl">📸</span> Picture must not be blurry, and it should be 1024px or more</li>
           </ul>
 
           <Field>
@@ -254,6 +226,19 @@ function Options() {
                   const file = e.target.files[0];
                   const newImageBase64 = await toBase64(file)
                   settings.setUpperBodyModelImage(newImageBase64)
+
+                  if (!newImageBase64) {
+                    console.log(`no upper body image to segment, aborting`)
+                    return
+                  }
+                  console.log(`calling model image segmenter on the upper body..`)
+                  try {
+                    const segmentationResult = await segmentImage(newImageBase64)
+                    if (!segmentationResult) { throw new Error(`segmentationResult is empty`) }
+                    settings.setUpperBodyModelMaskImage(segmentationResult)
+                  } catch (err) {
+                    console.log(`failed to segment the upper body: `, err)
+                  }
                 }
               }}
               accept="image/*"
@@ -288,15 +273,28 @@ function Options() {
                   const file = e.target.files[0];
                   const newImageBase64 = await toBase64(file)
                   settings.setFullBodyModelImage(newImageBase64)
+
+                  if (!newImageBase64) {
+                    console.log(`no full body image to segment, aborting`)
+                    return
+                  }
+                  console.log(`calling model image segmenter on the full body..`)
+                  try {
+                    const segmentationResult = await segmentImage(newImageBase64)
+                    if (!segmentationResult) { throw new Error(`segmentationResult is empty`) }
+                    settings.setFullBodyModelMaskImage(segmentationResult)
+                  } catch (err) {
+                    console.log(`failed to segment the full body: `, err)
+                  }
                 }
               }}
               accept="image/*"
             />
           </Field>
 
-        </div>
+        </div>}
 
-        <div className="flex flex-col space-y-6 bg-zinc-200 p-4 rounded-2xl shadow-lg border-1 border-zinc-700">
+        {hasValidCredentials && <div className="flex flex-col space-y-6 bg-zinc-200 px-4 pt-4 pb-6 rounded-2xl shadow-lg border-1 border-zinc-700">
           <div className="flex flex-row space-x-2 mb-2 items-center">
             <div className="w-8 h-8 flex flex-col items-center justify-center text-center rounded-full bg-zinc-700 text-zinc-200 text-xl font-semibold">3</div>
             <div className="text-2xl font-semibold text-zinc-700">Customize provider settings (optional)</div>
@@ -337,7 +335,7 @@ function Options() {
             </Field>
           </>}
 
-          {settings.engine === "CUSTOM_REPLICATE" && <>
+          {settings.engine === "REPLICATE" && <>
             <Field>
               <Label>Inference steps ({settings.replicateNumberOfSteps}):</Label>
               <Slider
@@ -407,7 +405,8 @@ function Options() {
             </Field>
           </>}
 
-        </div>
+        </div>}
+        
         <div className="pt-2 h-16">
           <div className="flex flex-row w-full items-center justify-center">
             <Button
