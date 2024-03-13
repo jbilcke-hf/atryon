@@ -1,7 +1,7 @@
 export type Engine =
-  | "HUGGINGFACE"
-  | "REPLICATE"
-  | "LOCALHOST"
+  | "DEFAULT" // default engine
+  | "GRADIO_API" // url to local or remote gradio spaces
+  | "CUSTOM_REPLICATE" // url to replicate api(s)
 
 export type SettingsSaveStatus =
   | "idle"
@@ -36,6 +36,8 @@ export type ImageURL = {
   proposedUris: string[]
 }
 
+export type ImageSegmenter = (modelImage: string) => Promise<string>
+
 export type ImageReplacer = ({ garmentImage, modelImage }: { garmentImage: string; modelImage: string; }) => Promise<string[]>
 
 export type ReplaceImageWithReplicate = {
@@ -68,7 +70,9 @@ export type PredictionReplaceImageWithReplicate = {
 }
 
 export type Settings = {
-  // engine (HUGGINGFACE, REPLICATE or LOCALHOST)
+  // DEFAULT: default engine
+  // GRADIO_API: url to local or remote gradio spaces
+  // CUSTOM_REPLICATE: url to replicate api(s)
   engine: Engine
 
   // --------------- HUGGING FACE ----------------------------
@@ -76,8 +80,11 @@ export type Settings = {
   // api key of the Hugging Face account
   huggingfaceApiKey: string
 
-  // url of the Hugging Face Space (Gradio API)
-  huggingfaceSpaceUrl: string
+  // url of the Hugging Face Space for segmentation (Gradio API)
+  huggingfaceSegmentationSpaceUrl: string
+
+  // url of the Hugging Face Space for substitution (Gradio API)
+  huggingfaceSubstitutionSpaceUrl: string
 
   // Number of steps for the Huging Face model
   huggingfaceNumberOfSteps: number
@@ -92,10 +99,16 @@ export type Settings = {
   replicateApiKey: string
 
   // replicate model name
-  replicateModel: string
+  replicateSegmentationModel: string
 
   // Replicate model version
-  replicateModelVersion: string
+  replicateSegmentationModelVersion: string
+
+  // replicate model name
+  replicateSubstitutionModel: string
+
+  // Replicate model version
+  replicateSubstitutionModelVersion: string
 
   // Number of steps for the Replicate model
   replicateNumberOfSteps: number
@@ -106,23 +119,26 @@ export type Settings = {
 
   // --------------- LOCAL SERVER ---------------------------
 
-  // api key for local usage (eg. for privacy or development purposes)
-  localhostApiKey: string
+  // optional api key in case local usage (eg. for privacy or development purposes)
+  customGradioApiKey: string
 
-  // url of the local API (eg. for privacy or development purposes)
-  localhostApiUrl: string
+  // url of the Hugging Face Space for segmentation (Gradio API)
+  customGradioApiSegmentationSpaceUrl: string
+
+  // url of the Hugging Face Space for substitution (Gradio API)
+  customGradioApiSubstitutionSpaceUrl: string
 
   // Number of steps for the local model
-  localhostNumberOfSteps: 20
+  customGradioApiNumberOfSteps: number
 
   // Guidance scale for the local model
-  localhostGuidanceScale: 2
+  customGradioApiGuidanceScale: number
 
-  // the current active image
-  modelImage: string
+  upperBodyModelImage: string
+  upperBodyModelMaskImage: string
 
-  // list of available images
-  modelImages: string[]
+  fullBodyModelImage: string
+  fullBodyModelMaskImage: string
 
   // to enable or disable the substitution
   isEnabled: boolean

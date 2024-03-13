@@ -3,16 +3,20 @@ import { Settings } from "@/types";
 export function getDefaultSettings(): Settings {
 
   return {
-    // engine (HUGGINGFACE, REPLICATE or LOCALHOST)
-    engine: "REPLICATE",
+    // DEFAULT: default engine
+    // GRADIO_API: url to local or remote gradio spaces
+    // CUSTOM_REPLICATE: url to replicate api(s)
+    engine: "DEFAULT",
 
     // api key of the Hugging Face account
     huggingfaceApiKey: "",
 
-    // url of the Hugging Face Space (Gradio API)
-    huggingfaceSpaceUrl: "localhost:3000",
-
-
+    // url of the Hugging Face Space for segmentation (Gradio API)
+    huggingfaceSegmentationSpaceUrl: "https://jbilcke-hf-oot-segmentation.hf.space",
+    
+    // url of the Hugging Face Space for substitution (Gradio API)
+    huggingfaceSubstitutionSpaceUrl: "https://jbilcke-hf-oot-diffusion-with-mask.hf.space",
+    
     // Number of steps for the Hugging Face model
     huggingfaceNumberOfSteps: 20,
 
@@ -24,10 +28,16 @@ export function getDefaultSettings(): Settings {
     replicateApiKey: "",
 
     // replicate model name
-    replicateModel: "viktorfa/oot_diffusion",
+    replicateSegmentationModel: "viktorfa/oot_segmentation",
 
     // Replicate model version
-    replicateModelVersion: "9f8fa4956970dde99689af7488157a30aa152e23953526a605df1d77598343d7",
+    replicateSegmentationModelVersion: "029c7a3275615693983f1186a94d3c02a5a46750a763e5deb30c1b608b7c3003",
+
+    // replicate model name
+    replicateSubstitutionModel: "viktorfa/oot_diffusion_with_mask",
+
+    // Replicate model version
+    replicateSubstitutionModelVersion: "c890e02d8180bde7eeed1a138217ee154d8cdd8769a29f02bd51fea33d268385",
 
     // Number of steps for the Replicate model
     replicateNumberOfSteps: 20,
@@ -36,22 +46,25 @@ export function getDefaultSettings(): Settings {
     replicateGuidanceScale: 2,
 
     // api key for local usage (eg. for privacy or development purposes)
-    localhostApiKey: "",
+    customGradioApiKey: "",
 
-    // url of the local API (eg. for privacy or development purposes)
-    localhostApiUrl: "localhost:3000",
+    // url of the Hugging Face Space for segmentation (Gradio API)
+    customGradioApiSegmentationSpaceUrl:  "http://localhost:7860",
+
+    // url of the local API for substitution (Gradio API)
+    customGradioApiSubstitutionSpaceUrl:  "http://localhost:7861",
 
     // Number of steps for the local model
-    localhostNumberOfSteps: 20,
+    customGradioApiNumberOfSteps: 20,
 
     // Guidance scale f or the local model
-    localhostGuidanceScale: 2,
+    customGradioApiGuidanceScale: 2,
 
-    // the current active model image
-    modelImage: "",
+    upperBodyModelImage: "",
+    upperBodyModelMaskImage: "",
 
-    // list of available model images
-    modelImages: [],
+    fullBodyModelImage: "",
+    fullBodyModelMaskImage: "",
 
     // to enable or disable the substitution
     isEnabled: false,

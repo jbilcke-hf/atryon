@@ -9,14 +9,19 @@ export function useSettings() {
 
   const [status, setStatus] = useState<SettingsSaveStatus>("idle")
 
-  // engine (HUGGINGFACE, REPLICATE or LOCALHOST)
+  // DEFAULT: default engine
+  // GRADIO_API: url to local or remote gradio spaces
+  // CUSTOM_REPLICATE: url to replicate api(s)
   const [engine, setEngine] = useState<Engine>(defaultSettings.engine)
 
   // api key of the Hugging Face account
   const [huggingfaceApiKey, setHuggingfaceApiKey] = useState<string>(defaultSettings.huggingfaceApiKey)
+  
+  // url of the Hugging Face Space for segmentation (Gradio API)
+  const [huggingfaceSegmentationSpaceUrl, setHuggingfaceSegmentationSpaceUrl] = useState<string>(defaultSettings.huggingfaceSegmentationSpaceUrl)
 
-  // url of the Hugging Face Space (Gradio API)
-  const [huggingfaceSpaceUrl, setHuggingfaceSpaceUrl] = useState<string>(defaultSettings.huggingfaceSpaceUrl)
+  // url of the Hugging Face Space for substitution (Gradio API)
+  const [huggingfaceSubstitutionSpaceUrl, setHuggingfaceSubstitutionSpaceUrl] = useState<string>(defaultSettings.huggingfaceSubstitutionSpaceUrl)
 
   // Number of steps for the Hugging Face model
   const [huggingfaceNumberOfSteps, setHuggingfaceNumberOfSteps] = useState<number>(defaultSettings.huggingfaceNumberOfSteps)
@@ -28,10 +33,16 @@ export function useSettings() {
   const [replicateApiKey, setReplicateApiKey] = useState<string>(defaultSettings.replicateApiKey)
 
   // replicate model name
-  const [replicateModel, setReplicateModel] = useState<string>(defaultSettings.replicateModel)
+  const [replicateSegmentationModel, setReplicateSegmentationModel] = useState<string>(defaultSettings.replicateSegmentationModel)
 
   // Replicate model version
-  const [replicateModelVersion, setReplicateModelVersion] = useState<string>(defaultSettings.replicateModelVersion)
+  const [replicateSegmentationModelVersion, setReplicateSegmentationModelVersion] = useState<string>(defaultSettings.replicateSegmentationModelVersion)
+
+  // replicate model name
+  const [replicateSubstitutionModel, setReplicateSubstitutionModel] = useState<string>(defaultSettings.replicateSubstitutionModel)
+
+  // Replicate model version
+  const [replicateSubstitutionModelVersion, setReplicateSubstitutionModelVersion] = useState<string>(defaultSettings.replicateSubstitutionModelVersion)
 
   // Number of steps for the Replicate model
   const [replicateNumberOfSteps, setReplicateNumberOfSteps] = useState<number>(defaultSettings.replicateNumberOfSteps)
@@ -40,22 +51,24 @@ export function useSettings() {
   const [replicateGuidanceScale, setReplicateGuidanceScale] = useState<number>(defaultSettings.replicateGuidanceScale)
 
   // api key for local usage (eg. for privacy or development purposes)
-  const [localhostApiKey, setLocalhostApiKey] = useState<string>(defaultSettings.localhostApiKey)
+  const [customGradioApiKey, setCustomGradioApiKey] = useState<string>(defaultSettings.customGradioApiKey)
 
-  // url of the local API (eg. for privacy or development purposes)
-  const [localhostApiUrl, setLocalhostApiUrl] = useState<string>(defaultSettings.localhostApiUrl)
+  // url of the Hugging Face Space for segmentation (Gradio API)
+  const [customGradioApiSegmentationSpaceUrl, setCustomGradioApiSegmentationSpaceUrl] = useState<string>(defaultSettings.customGradioApiSegmentationSpaceUrl)
+
+  //  url of the local API for substitution (Gradio API)
+  const [customGradioApiSubstitutionSpaceUrl, setCustomGradioApiSubstitutionSpaceUrl] = useState<string>(defaultSettings.customGradioApiSubstitutionSpaceUrl)
 
   // Number of steps for the local model
-  const [localhostNumberOfSteps, setLocalhostNumberOfSteps] = useState<number>(defaultSettings.localhostNumberOfSteps)
+  const [customGradioApiNumberOfSteps, setCustomGradioApiNumberOfSteps] = useState<number>(defaultSettings.customGradioApiNumberOfSteps)
 
   // Guidance scale for the local model
-  const [localhostGuidanceScale, setLocalhostGuidanceScale] = useState<number>(defaultSettings.localhostGuidanceScale)
-  
-  // the current active model image
-  const [modelImage, setModelImage] = useState<string>(defaultSettings.modelImage)
+  const [customGradioApiGuidanceScale, setCustomGradioApiGuidanceScale] = useState<number>(defaultSettings.customGradioApiGuidanceScale)
 
-  // list of available model images
-  const [modelImages, setModelImages] = useState<string[]>(defaultSettings.modelImages)
+  const [upperBodyModelImage, setUpperBodyModelImage] = useState<string>(defaultSettings.upperBodyModelImage)
+  const [upperBodyModelMaskImage, setUpperBodyModelMaskImage] = useState<string>(defaultSettings.upperBodyModelMaskImage)
+  const [fullBodyModelImage, setFullBodyModelImage] = useState<string>(defaultSettings.fullBodyModelImage)
+  const [fullBodyModelMaskImage, setFullBodyModelMaskImage] = useState<string>(defaultSettings.fullBodyModelMaskImage)
 
   // to enable or disable the substitution
   const [isEnabled, setEnabled] = useState<boolean>(defaultSettings.isEnabled)
@@ -68,23 +81,29 @@ export function useSettings() {
         setEngine(settings.engine)
 
         setHuggingfaceApiKey(settings.huggingfaceApiKey)
-        setHuggingfaceSpaceUrl(settings.huggingfaceSpaceUrl)
+        setHuggingfaceSegmentationSpaceUrl(settings.huggingfaceSegmentationSpaceUrl)
+        setHuggingfaceSubstitutionSpaceUrl(settings.huggingfaceSubstitutionSpaceUrl)
         setHuggingfaceNumberOfSteps(settings.huggingfaceNumberOfSteps)
         setHuggingfaceGuidanceScale(settings.huggingfaceGuidanceScale)
 
         setReplicateApiKey(settings.replicateApiKey)
-        setReplicateModel(settings.replicateModel)
-        setReplicateModelVersion(settings.replicateModelVersion)
+        setReplicateSegmentationModel(settings.replicateSegmentationModel)
+        setReplicateSegmentationModelVersion(settings.replicateSegmentationModelVersion)
+        setReplicateSubstitutionModel(settings.replicateSubstitutionModel)
+        setReplicateSubstitutionModelVersion(settings.replicateSubstitutionModelVersion)
         setReplicateNumberOfSteps(settings.replicateNumberOfSteps)
         setReplicateGuidanceScale(settings.replicateGuidanceScale)
 
-        setLocalhostApiKey(settings.localhostApiKey)
-        setLocalhostApiUrl(settings.localhostApiUrl)
-        setLocalhostNumberOfSteps(settings.localhostNumberOfSteps)
-        setLocalhostGuidanceScale(settings.localhostGuidanceScale)
+        setCustomGradioApiKey(settings.customGradioApiKey)
+        setCustomGradioApiSegmentationSpaceUrl(settings.customGradioApiSegmentationSpaceUrl)
+        setCustomGradioApiSubstitutionSpaceUrl(settings.customGradioApiSubstitutionSpaceUrl)
+        setCustomGradioApiNumberOfSteps(settings.customGradioApiNumberOfSteps)
+        setCustomGradioApiGuidanceScale(settings.customGradioApiGuidanceScale)
 
-        setModelImage(settings.modelImage)
-        setModelImages(settings.modelImages)
+        setUpperBodyModelImage(settings.upperBodyModelImage)
+        setUpperBodyModelMaskImage(settings.upperBodyModelMaskImage)
+        setFullBodyModelImage(settings.fullBodyModelImage)
+        setFullBodyModelMaskImage(settings.fullBodyModelMaskImage)
 
         setEnabled(settings.isEnabled)
       }
@@ -99,23 +118,29 @@ export function useSettings() {
         engine,
 
         huggingfaceApiKey,
-        huggingfaceSpaceUrl,
+        huggingfaceSegmentationSpaceUrl,
+        huggingfaceSubstitutionSpaceUrl,
         huggingfaceNumberOfSteps,
         huggingfaceGuidanceScale,
 
         replicateApiKey,
-        replicateModel,
-        replicateModelVersion,
+        replicateSegmentationModel,
+        replicateSegmentationModelVersion,
+        replicateSubstitutionModel,
+        replicateSubstitutionModelVersion,
         replicateNumberOfSteps,
         replicateGuidanceScale,
 
-        localhostApiKey,
-        localhostApiUrl,
-        localhostNumberOfSteps,
-        localhostGuidanceScale,
+        customGradioApiKey,
+        customGradioApiSegmentationSpaceUrl,
+        customGradioApiSubstitutionSpaceUrl,
+        customGradioApiNumberOfSteps,
+        customGradioApiGuidanceScale,
 
-        modelImage,
-        modelImages,
+        upperBodyModelImage,
+        upperBodyModelMaskImage,
+        fullBodyModelImage,
+        fullBodyModelMaskImage,
 
         isEnabled,
       },
@@ -143,9 +168,10 @@ export function useSettings() {
     // api key of the Hugging Face account
     huggingfaceApiKey, setHuggingfaceApiKey,
 
-    // url of the Hugging Face Space (Gradio API)
-    huggingfaceSpaceUrl, setHuggingfaceSpaceUrl,
-
+    // url of the Hugging Face Spaces (Gradio API)
+    huggingfaceSegmentationSpaceUrl, setHuggingfaceSegmentationSpaceUrl,
+    huggingfaceSubstitutionSpaceUrl, setHuggingfaceSubstitutionSpaceUrl,
+    
     // Number of steps for the Hugging Face model
     huggingfaceNumberOfSteps, setHuggingfaceNumberOfSteps,
 
@@ -156,10 +182,16 @@ export function useSettings() {
     replicateApiKey, setReplicateApiKey,
 
     // replicate model name
-    replicateModel, setReplicateModel,
+    replicateSegmentationModel, setReplicateSegmentationModel,
 
     // Replicate model version
-    replicateModelVersion, setReplicateModelVersion,
+    replicateSegmentationModelVersion, setReplicateSegmentationModelVersion,
+
+    // replicate model name
+    replicateSubstitutionModel, setReplicateSubstitutionModel,
+
+    // Replicate model version
+    replicateSubstitutionModelVersion, setReplicateSubstitutionModelVersion,
 
     // Number of steps for the Replicate model
     replicateNumberOfSteps, setReplicateNumberOfSteps,
@@ -168,22 +200,22 @@ export function useSettings() {
     replicateGuidanceScale, setReplicateGuidanceScale,
 
     // api key for local usage (eg. for privacy or development purposes)
-    localhostApiKey, setLocalhostApiKey,
+    customGradioApiKey, setCustomGradioApiKey,
 
-    // url of the local API (eg. for privacy or development purposes)
-    localhostApiUrl, setLocalhostApiUrl,
+    // url of the local APIs (eg. for privacy or development purposes)
+    customGradioApiSegmentationSpaceUrl, setCustomGradioApiSegmentationSpaceUrl,
+    customGradioApiSubstitutionSpaceUrl, setCustomGradioApiSubstitutionSpaceUrl,
 
     // Number of steps for the local model
-    localhostNumberOfSteps, setLocalhostNumberOfSteps,
+    customGradioApiNumberOfSteps, setCustomGradioApiNumberOfSteps,
 
     // Guidance scale for the local model
-    localhostGuidanceScale, setLocalhostGuidanceScale,
+    customGradioApiGuidanceScale, setCustomGradioApiGuidanceScale,
 
-    // the current active model image
-    modelImage, setModelImage,
-
-    // list of available model images
-    modelImages, setModelImages,
+    upperBodyModelImage, setUpperBodyModelImage,
+    upperBodyModelMaskImage, setUpperBodyModelMaskImage,
+    fullBodyModelImage, setFullBodyModelImage,
+    fullBodyModelMaskImage, setFullBodyModelMaskImage,
 
     // to enable or disable the substitution
     isEnabled,

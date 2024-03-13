@@ -12,12 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Field } from "@/components/forms/field"
 import { Label } from "@/components/forms/label"
 import { Input } from "@/components/forms/input"
+import { toBase64 } from "./utils/toBase64"
 
 
 function Options() {
   const settings = useSettings()
 
   console.log(`this is the options panel`)
+
 
   return (
     <div className={cn(
@@ -35,6 +37,74 @@ function Options() {
         </div>
 
         <Field>
+          <Label>Select upper-body image (please take a picture with a neutral background)</Label>
+
+          <div className="grid grid-cols-2 gap-4">
+            {settings.upperBodyModelImage && <div className="flex flex-col items-center">
+              <img
+                src={settings.upperBodyModelImage}
+                className="w-full h-auto my-4 rounded-xl overflow-hidden"
+              />
+              <p>Your upper body</p>
+            </div>}
+
+            {settings.upperBodyModelMaskImage && <div className="flex flex-col items-center">
+              <img
+                src={settings.upperBodyModelMaskImage}
+                className="w-full h-auto my-4 rounded-xl overflow-hidden"
+              />
+              <p>Body mask</p>
+            </div>}
+          </div>
+
+          <Input
+            type="file"
+            className=""
+            onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files && e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const newImageBase64 = await toBase64(file)
+                settings.setUpperBodyModelImage(newImageBase64)
+              }
+            }}
+            accept="image/*"
+          />
+        </Field>
+
+        <Field>
+          <Label>Select full-body image (please take a picture with a neutral background)</Label>
+            
+          <div className="grid grid-cols-2 gap-4">
+            {settings.fullBodyModelImage && <div className="flex flex-col items-center">
+              <img
+                src={settings.fullBodyModelImage}
+                className="w-full h-auto my-4 rounded-xl overflow-hidden"
+              />
+              <p>Your full body</p>
+            </div>}
+            {settings.fullBodyModelMaskImage && <div className="flex flex-col items-center">
+              <img
+                src={settings.fullBodyModelMaskImage}
+                className="w-full h-auto my-4 rounded-xl overflow-hidden"
+              />
+              <p>Body mask</p>
+            </div>}
+          </div>
+          <Input
+            type="file"
+            className=""
+            onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files && e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const newImageBase64 = await toBase64(file)
+                settings.setFullBodyModelImage(newImageBase64)
+              }
+            }}
+            accept="image/*"
+          />
+        </Field>
+
+        <Field>
           <Label>Please select a server/provider:</Label>
           <Select
             onValueChange={(value: string) => {
@@ -45,36 +115,23 @@ function Options() {
               <SelectValue placeholder="Engine" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="HUGGINGFACE">Hugging Face (free, recommended)</SelectItem>
-              <SelectItem value="REPLICATE">Replicate (will use your own account)</SelectItem>
-              <SelectItem value="LOCALHOST">Localhost (max privacy - for expert users only)</SelectItem>
+              <SelectItem value="DEFAULT">Default (free for Hugging Face users)</SelectItem>
+              {/* <SelectItem value="CUSTOM">Custom (max privacy - for expert users only)</SelectItem> */}
             </SelectContent>
           </Select>
         </Field>
 
-        {settings.engine === "HUGGINGFACE" && <>
+        {settings.engine === "DEFAULT" && <>
           <Field>
-            <Label>Hugging Face API Token:</Label>
+            <Label>Hugging Face API key:</Label>
             <Input
               className="font-mono"
               type="password"
-              placeholder="Hugging Face API Key"
+              placeholder="Hugging Face API key"
               onChange={(x) => {
                 settings.setHuggingfaceApiKey(x.target.value)
               }}
               value={settings.huggingfaceApiKey}
-            />
-          </Field>
-          <Field>
-            <Label>Space API:</Label>
-            <Input
-              className="font-mono"
-              type="text"
-              placeholder={settings.defaultSettings.huggingfaceSpaceUrl}
-              onChange={(x) => {
-                settings.setHuggingfaceSpaceUrl(x.target.value)
-              }}
-              value={settings.huggingfaceSpaceUrl}
             />
           </Field>
           <Field>
@@ -111,7 +168,7 @@ function Options() {
           </Field>
         </>}
 
-        {settings.engine === "REPLICATE" && <>
+        {settings.engine === "CUSTOM_REPLICATE" && <>
           <Field>
             <Label>Replicate API Token:</Label>
             <Input
@@ -125,27 +182,51 @@ function Options() {
             />
           </Field>
           <Field>
-            <Label>Replicate Model:</Label>
+            <Label>Segmentation model:</Label>
             <Input
               className="font-mono"
               type="text"
-              placeholder={settings.defaultSettings.replicateModel}
+              placeholder={settings.defaultSettings.replicateSegmentationModel}
               onChange={(x) => {
-                settings.setReplicateModel(x.target.value)
+                settings.setReplicateSegmentationModel(x.target.value)
               }}
-              value={settings.replicateModel}
+              value={settings.replicateSegmentationModel}
             />
           </Field>
           <Field>
-            <Label>Replicate Model Version:</Label>
+            <Label>Segmentation model version:</Label>
             <Input
               className="font-mono"
               type="text"
-              placeholder={settings.defaultSettings.replicateModelVersion}
+              placeholder={settings.defaultSettings.replicateSegmentationModelVersion}
               onChange={(x) => {
-                settings.setReplicateModelVersion(x.target.value)
+                settings.setReplicateSegmentationModelVersion(x.target.value)
               }}
-              value={settings.replicateModelVersion}
+              value={settings.replicateSegmentationModelVersion}
+            />
+          </Field>
+          <Field>
+            <Label>Substitution model:</Label>
+            <Input
+              className="font-mono"
+              type="text"
+              placeholder={settings.defaultSettings.replicateSubstitutionModel}
+              onChange={(x) => {
+                settings.setReplicateSubstitutionModel(x.target.value)
+              }}
+              value={settings.replicateSubstitutionModel}
+            />
+          </Field>
+          <Field>
+            <Label>Substitution model version:</Label>
+            <Input
+              className="font-mono"
+              type="text"
+              placeholder={settings.defaultSettings.replicateSubstitutionModelVersion}
+              onChange={(x) => {
+                settings.setReplicateSubstitutionModelVersion(x.target.value)
+              }}
+              value={settings.replicateSubstitutionModelVersion}
             />
           </Field>
           <Field>
@@ -183,7 +264,7 @@ function Options() {
           </>}
 
 
-          {settings.engine === "LOCALHOST" && <>
+          {settings.engine === "GRADIO_API" && <>
           <Field>
             <Label>Local API Token (optional):</Label>
             <Input
@@ -191,25 +272,37 @@ function Options() {
               type="password"
               placeholder="Enter your local server API Key (if any)"
               onChange={(x) => {
-                settings.setLocalhostApiKey(x.target.value)
+                settings.setCustomGradioApiKey(x.target.value)
               }}
-              value={settings.localhostApiKey}
+              value={settings.customGradioApiKey}
             />
           </Field>
           <Field>
-            <Label>Local server URL:</Label>
+            <Label>Segmentation server (Gradio API):</Label>
             <Input
               className="font-mono"
               type="text"
-              placeholder={settings.defaultSettings.localhostApiUrl}
+              placeholder={settings.defaultSettings.customGradioApiSegmentationSpaceUrl}
               onChange={(x) => {
-                settings.setLocalhostApiUrl(x.target.value)
+                settings.setCustomGradioApiSegmentationSpaceUrl(x.target.value)
               }}
-              value={settings.localhostApiUrl}
+              value={settings.customGradioApiSegmentationSpaceUrl}
             />
           </Field>
           <Field>
-            <Label>Inference steps ({settings.localhostNumberOfSteps}):</Label>
+            <Label>Substitution server (Gradio API):</Label>
+            <Input
+              className="font-mono"
+              type="text"
+              placeholder={settings.defaultSettings.customGradioApiSubstitutionSpaceUrl}
+              onChange={(x) => {
+                settings.setCustomGradioApiSubstitutionSpaceUrl(x.target.value)
+              }}
+              value={settings.customGradioApiSubstitutionSpaceUrl}
+            />
+          </Field>
+          <Field>
+            <Label>Inference steps ({settings.customGradioApiNumberOfSteps}):</Label>
             <Slider
               min={1}
               max={40}
@@ -218,14 +311,14 @@ function Options() {
                 let nbSteps = Number(value[0])
                 nbSteps = !isNaN(value[0]) && isFinite(value[0]) ? nbSteps : 0
                 nbSteps = Math.min(40, Math.max(1, nbSteps))
-                settings.setLocalhostNumberOfSteps(nbSteps)
+                settings.setCustomGradioApiNumberOfSteps(nbSteps)
               }}
-              defaultValue={[settings.defaultSettings.localhostNumberOfSteps]}
-              value={[settings.localhostNumberOfSteps]}
+              defaultValue={[settings.defaultSettings.customGradioApiNumberOfSteps]}
+              value={[settings.customGradioApiNumberOfSteps]}
             />
           </Field>
           <Field>
-            <Label>Guidance scale ({settings.localhostGuidanceScale}):</Label>
+            <Label>Guidance scale ({settings.customGradioApiGuidanceScale}):</Label>
             <Slider
               min={1}
               max={10}
@@ -234,10 +327,10 @@ function Options() {
                 let guidanceScale = Number(value[0])
                 guidanceScale = !isNaN(value[0]) && isFinite(value[0]) ? guidanceScale : 0
                 guidanceScale = Math.min(10, Math.max(1, guidanceScale))
-                settings.setLocalhostGuidanceScale(guidanceScale)
+                settings.setCustomGradioApiGuidanceScale(guidanceScale)
               }}
-              defaultValue={[settings.defaultSettings.localhostGuidanceScale]}
-              value={[settings.localhostGuidanceScale]}
+              defaultValue={[settings.defaultSettings.customGradioApiGuidanceScale]}
+              value={[settings.customGradioApiGuidanceScale]}
             />
           </Field>
           </>}
