@@ -110,12 +110,12 @@ export const replaceImage: ImageReplacer = async (garmentImage) => {
     throw new Error(`replaceImage(): the garmentImage appears invalid`)
   }
 
-  const modelImage = settings.upperBodyModelImage
+  const modelImage = settings.fullBodyModelImage
   if (!modelImage) {
     throw new Error(`replaceImage(): the modelImage appears invalid`)
   }
 
-  const modelMaskImage = settings.upperBodyModelMaskImage
+  const modelMaskImage = settings.fullBodyModelMaskImage
   if (!modelMaskImage) {
     throw new Error(`replaceImage(): the modelMaskImage appears invalid`)
   }

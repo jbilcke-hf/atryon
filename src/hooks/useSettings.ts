@@ -206,7 +206,10 @@ export function useSettings() {
   )
   
   const hasValidBodyModels = debugMode || (
-    hasValidUpperBodyModel && hasValidFullBodyModel
+    // for now we disable the upper body system,
+    // so we only keep 1 image
+    // hasValidUpperBodyModel && 
+    hasValidFullBodyModel
   )
 
   return {

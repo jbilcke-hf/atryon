@@ -15,12 +15,12 @@ export const replaceImage: ImageReplacer = async (garmentImage) => {
 	// upper body or full body?
 	// has a human model, so it needs segmentation or not?
 
-  const modelImage = settings.upperBodyModelImage
+  const modelImage = settings.fullBodyModelImage
   if (!modelImage) {
     throw new Error(`replaceImage(): the modelImage appears invalid`)
   }
 
-  const modelMaskImage = settings.upperBodyModelMaskImage
+  const modelMaskImage = settings.fullBodyModelMaskImage
   if (!modelMaskImage) {
     throw new Error(`replaceImage(): the modelMaskImage appears invalid`)
   }
@@ -29,8 +29,13 @@ export const replaceImage: ImageReplacer = async (garmentImage) => {
     throw new Error(`replaceImage(): the garmentImage appears invalid`)
   }
 
-  if (!settings.huggingfaceApiKey) {
-    throw new Error(`replaceImage(): the huggingfaceApiKey appears invalid`)
+  const apiKey =
+    settings.engine === "GRADIO_API"
+      ? settings.customGradioApiKey
+      : settings.huggingfaceApiKey
+
+  if (!apiKey) {
+    throw new Error(`replaceImage(): the apiKey appears invalid`)
   }
 
   const numberOfSteps =
@@ -77,7 +82,7 @@ export const replaceImage: ImageReplacer = async (garmentImage) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(params),
     cache: "no-store",
@@ -109,18 +114,19 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
     throw new Error(`segmentImage(): the modelImage appears invalid`)
   }
 
-  if (!settings.huggingfaceApiKey) {
-    throw new Error(`segmentImage(): the huggingfaceApiKey appears invalid`)
-  }
+  const apiKey =
+    settings.engine === "GRADIO_API"
+      ? settings.customGradioApiKey
+      : settings.huggingfaceApiKey
 
-  if (!settings.huggingfaceSegmentationSpaceUrl) {
-    throw new Error(`segmentImage(): the huggingfaceSegmentationSpaceUrl appears invalid`)
+  if (!apiKey) {
+    throw new Error(`replaceImage(): the apiKey appears invalid`)
   }
-
   const segmentationSpaceUrl =
     settings.engine === "GRADIO_API"
     ? settings.customGradioApiSegmentationSpaceUrl
     : settings.huggingfaceSegmentationSpaceUrl
+
 
   if (!segmentationSpaceUrl) {
     throw new Error(`segmentImage(): the segmentationSpaceUrl appears invalid`)
@@ -141,7 +147,7 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(params),
     cache: "no-store",

@@ -238,12 +238,23 @@ function Popup() {
         // COARSE ESTIMATOR
         // gives a value between 0 and 100
         // this will be like 0, 25, 50, 75, 100 etc.. if there are 4 images
-        const coarseProgress = Math.max(0, Math.min(maxProgress, maxProgress * (state.current.nbProcessedImages / state.current.nbImagesToProcess)))
+        const coarseProgress =
+        (state.current.nbProcessedImages  < 1 || state.current.nbImagesToProcess < 1)
+          ? 0
+          : Math.max(
+            0,
+            Math.min(
+              maxProgress,
+              maxProgress * (state.current.nbProcessedImages / state.current.nbImagesToProcess)
+            ))
 
         // gives us how many percent is taken by an image
         // eg if 2 images -> 50%, if 3 images then 33.333..% etc
-        const coarseResolution = maxProgress / state.current.nbProcessedImages
-
+        let coarseResolution =
+          (maxProgress < 1 || state.current.nbProcessedImages < 1)
+            ? 100
+            : (maxProgress / state.current.nbProcessedImages)
+        
         // FINE ESTIMATOR
         // each image should take ~20 seconds with normal server usage
         const expectedTimeSpentOnCurrentImageInMs = 20 * 1000

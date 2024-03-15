@@ -190,6 +190,7 @@ function Options() {
             <li><span className="text-2xl">📸</span> The image resolution should be at least 1024px</li>
           </ul>
 
+          {/*
           <Field>
             <Label className="">Upper-body picture 🙎</Label>
 
@@ -237,6 +238,7 @@ function Options() {
               accept="image/*"
             />
           </Field>
+          */}
 
 
           <Field>
