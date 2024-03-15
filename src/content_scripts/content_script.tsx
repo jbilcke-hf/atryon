@@ -74,12 +74,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           // however we can't be *too* strict either,
           // as some sites don't pass the 1024px size limit
           // eg. https://www.checkpoint-tshirt.com/cdn/shop/products/empire-wave-tee-shirt-homme_denim_2048x.jpg?v=1680850296
-          
-          if (width < 1000) {
+          // and on Shein, it can even be 900px..
+          if (width < 900) {
             goodCandidate = false
           }
           
-          if (height < 1000) {
+          if (height < 900) {
            goodCandidate = false
           }
    
