@@ -1,5 +1,13 @@
+import { urlMightBeInvalid } from "@/heuristics/urlMightBeInvalid"
 import { WorkerMessage, ImageURL } from "@/types"
+import { downloadImageToBase64 } from "@/utils/downloadImageToBase64"
+import { elementIsVisible } from "@/utils/elementIsVisible"
 import { getImageDimension } from "@/utils/getImageDimension"
+import { getVisibleImages } from "@/utils/getVisibleImages"
+
+const state = {
+  index: {} as Record<string, ImageURL>
+}
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   const message = JSON.parse(JSON.stringify(msg))
@@ -11,46 +19,97 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
     if (action === "SCAN_IMAGES") {
         
-      let images: ImageURL[] = []
+      let goodImages: ImageURL[] = []
 
       try {
 
         console.log(`ON SCAN_IMAGES..`)
         // main job: to regularly update the currentImages object
-        const currentImages = document.getElementsByTagName("img")
+        const visibleImages = getVisibleImages()
 
-        for (let i = 0, l = currentImages.length; i<l; i++) {
-          const originalUri = currentImages[i].src
+        for (let element of visibleImages) {
+          const originalUri = element.src || ""
+
+          // we try to avoid obviously "wrong" images
+          if (urlMightBeInvalid(originalUri)) {
+            continue
+          }
+
+          // finally, to optimize things and avoid endless download,
+          // we also skip images that are already in the index
+          if (state.index[originalUri]) {
+            continue
+          }
+
+          let goodCandidate = true
+
+          let dataUri = ""
+          
+          // now, the issue is that the image element might contain a low resolution version
+          // so we want to actually re-download the original
+          try {
+
+            // TODO: maybe we should look into the src set, for an even higher resolution?
+            const bestImageSrc = element.currentSrc || element.src || ""
+
+            dataUri = await downloadImageToBase64(bestImageSrc)
+          } catch (err) {
+            // console.log(`failed to download an image: ${err}`)
+            goodCandidate = false
+          }
 
           let resolution: { width: number; height: number } = { width: 0, height: 0 }
+  
           try {
-            resolution = await getImageDimension(originalUri)
+            resolution = await getImageDimension(dataUri)
           } catch (err) {
             // resolution = { width: 0, height: 0 }
-            console.error(`failed to detect resolution of image ${originalUri}: ${err}`)
+            // console.error(`failed to detect resolution of the image: ${err}`)
+            goodCandidate = false
           }
           
           const { width, height } = resolution
-     
-          images.push({
+
+          // we want to be a bit strict here
+          // however we can't be *too* strict either,
+          // as some sites don't pass the 1024px size limit
+          // eg. https://www.checkpoint-tshirt.com/cdn/shop/products/empire-wave-tee-shirt-homme_denim_2048x.jpg?v=1680850296
+          
+          if (width < 1000) {
+            goodCandidate = false
+          }
+          
+          if (height < 1000) {
+           goodCandidate = false
+          }
+   
+
+          const imageURL: ImageURL = {
             originalUri,
+            dataUri,
             width,
             height,
-            goodCandidate: width >= 640 && height >= 640,
-            status: "unprocessed",
+            goodCandidate,
+            status: goodCandidate ? "unprocessed" : "invalid",
             proposedUris: [],
-          })
+          }
+
+          state.index[originalUri] = imageURL
+
+          if (goodCandidate) {
+            goodImages.push(imageURL)
+          }
         }
 
       } catch (err) {
         console.error(`failed to scan the images!`, err)
       }
 
-      console.log("returning an ImageURL array:", images)
-      sendResponse(images)
+      console.log("returning an ImageURL array fo good images:", goodImages)
+      sendResponse(goodImages)
     } else if (action === "REPLACE_IMAGES") {
 
-      console.log("content_script.tsx: got action to replace the image..")
+      console.log("content_script.tsx: got action to replace the image..",  message.images)
       const index: Record<string, ImageURL> = {}
       const images = message.images as ImageURL[]
       for (let image of images) {
@@ -62,17 +121,30 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       try {
 
         console.log(`ON REPLACE_IMAGES..`)
-        // main job: to regularly update the currentImages object
-        const currentImages = document.getElementsByTagName("img")
+        // note: here we replace images everywhere, even the invisible one
+        // that's because the user might have scrolled within the page
+        // while the request was running in the background
+        const currentImages = document.images
 
         for (let i = 0, l = currentImages.length; i<l; i++) {
           const originalUri = currentImages[i].src
-          // console.log(`image ${i}:`, originalUri)
+     
           const match = index[originalUri]
-          // console.log("match:", match)
-          if (match && match?.proposedUris?.length) {
-            // console.log("match is valid!")
-            currentImages[i].src = match.proposedUris[0]
+
+          // console.log(`image ${i}:`, originalUri)
+
+          if (
+            match &&
+            match.goodCandidate &&
+            match.status === "success" &&
+            match?.proposedUris?.length) {
+            console.log("match is valid! replacing image:", match)
+            const firstProposal = match.proposedUris[0]
+
+            // we need to replace both src and srcset
+            currentImages[i].src = firstProposal
+            currentImages[i].srcset = firstProposal
+
             replacedImages.push(match)
           }
         }

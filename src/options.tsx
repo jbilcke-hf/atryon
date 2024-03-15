@@ -12,19 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Field } from "@/components/forms/field"
 import { Label } from "@/components/forms/label"
 import { Input } from "@/components/forms/input"
-import { toBase64 } from "./utils/toBase64"
+import { fileToBase64 } from "./utils/fileToBase64"
 import { segmentImage } from "./components/core/segmentImage"
 
 
 function Options() {
   const settings = useSettings()
-
-  const hasValidDefaultCredentials = settings.engine === "DEFAULT" && settings.huggingfaceApiKey
-  const hasValidCustomGradioApiCredentials = settings.engine === "GRADIO_API" && settings.customGradioApiKey
-  const hasValidReplicateCredentials = settings.engine === "REPLICATE" && settings.replicateApiKey
-  
-  const hasValidCredentials =
-    hasValidDefaultCredentials || hasValidCustomGradioApiCredentials || hasValidReplicateCredentials
 
   return (
     <div className={cn(
@@ -180,21 +173,21 @@ function Options() {
           </>}
         </div>
 
-        {hasValidCredentials && <div className="flex flex-col space-y-5 bg-zinc-200 p-4 rounded-2xl shadow-lg border-1 border-zinc-700">
+        {settings.hasValidCredentials && <div className="flex flex-col space-y-5 bg-zinc-200 p-4 rounded-2xl shadow-lg border-1 border-zinc-700">
           <div className="flex flex-row space-x-2 items-center">
             <div className="w-8 h-8 flex flex-col items-center justify-center text-center rounded-full bg-zinc-700 text-zinc-200 text-xl font-semibold">2</div>
             <div className="text-2xl font-semibold text-zinc-700">Add pictures of yourself</div>
           </div>
 
           <p className="text-zinc-700 text-base font-semibold">
-            For best results, please follow those instructions:
+            Please follow those instructions for best results:
           </p>
 
           <ul className="text-zinc-700 text-base">
             <li><span className="text-2xl">👕</span> Wear simple clothes (eg. white t-shirt, trousers)</li>
             <li><span className="text-2xl">🧍</span> Face the camera, with arms hanging on the sides</li>
-            <li><span className="text-2xl">💡</span> Go outside or in well lit room, with a neutral background (eg. white walls)</li>
-            <li><span className="text-2xl">📸</span> Picture must not be blurry, and it should be 1024px or more</li>
+            <li><span className="text-2xl">💡</span> Use a well lit environment, with a neutral background</li>
+            <li><span className="text-2xl">📸</span> The image resolution should be at least 1024px</li>
           </ul>
 
           <Field>
@@ -224,7 +217,7 @@ function Options() {
               onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
                 if (e.target.files && e.target.files.length > 0) {
                   const file = e.target.files[0];
-                  const newImageBase64 = await toBase64(file)
+                  const newImageBase64 = await fileToBase64(file)
                   settings.setUpperBodyModelImage(newImageBase64)
 
                   if (!newImageBase64) {
@@ -271,7 +264,7 @@ function Options() {
               onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
                 if (e.target.files && e.target.files.length > 0) {
                   const file = e.target.files[0];
-                  const newImageBase64 = await toBase64(file)
+                  const newImageBase64 = await fileToBase64(file)
                   settings.setFullBodyModelImage(newImageBase64)
 
                   if (!newImageBase64) {
@@ -294,7 +287,7 @@ function Options() {
 
         </div>}
 
-        {hasValidCredentials && <div className="flex flex-col space-y-6 bg-zinc-200 px-4 pt-4 pb-6 rounded-2xl shadow-lg border-1 border-zinc-700">
+        {settings.hasValidCredentials && settings.hasValidBodyModels && <div className="flex flex-col space-y-6 bg-zinc-200 px-4 pt-4 pb-6 rounded-2xl shadow-lg border-1 border-zinc-700">
           <div className="flex flex-row space-x-2 mb-2 items-center">
             <div className="w-8 h-8 flex flex-col items-center justify-center text-center rounded-full bg-zinc-700 text-zinc-200 text-xl font-semibold">3</div>
             <div className="text-2xl font-semibold text-zinc-700">Customize provider settings (optional)</div>
@@ -406,7 +399,7 @@ function Options() {
           </>}
 
         </div>}
-        
+
         <div className="pt-2 h-16">
           <div className="flex flex-row w-full items-center justify-center">
             <Button

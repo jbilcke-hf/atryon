@@ -27,6 +27,7 @@ export type WorkerMessage =
 
 export type ImageURL = {
   originalUri: string
+  dataUri: string
   width: number
   height: number
   goodCandidate: boolean
@@ -37,8 +38,7 @@ export type ImageURL = {
 }
 
 export type ImageSegmenter = (modelImage: string) => Promise<string>
-
-export type ImageReplacer = ({ garmentImage, modelImage }: { garmentImage: string; modelImage: string; }) => Promise<string[]>
+export type ImageReplacer = (garmentImage: string) => Promise<string[]>
 
 export type ReplaceImageWithReplicate = {
   seed: number;

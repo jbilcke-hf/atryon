@@ -186,6 +186,29 @@ export function useSettings() {
     isEnabled,
   ])
 
+  // set to true to disable validation
+  const debugMode = false
+
+  const hasValidDefaultCredentials = debugMode || (engine === "DEFAULT" && huggingfaceApiKey.length > 8)
+  const hasValidCustomGradioApiCredentials = debugMode || (engine === "GRADIO_API" && customGradioApiKey.length > 8)
+  const hasValidReplicateCredentials = debugMode || (engine === "REPLICATE" && replicateApiKey.length > 8)
+  
+  const hasValidCredentials = debugMode || (
+    hasValidDefaultCredentials || hasValidCustomGradioApiCredentials || hasValidReplicateCredentials
+  )
+  
+  const hasValidUpperBodyModel = debugMode || (
+    upperBodyModelImage.length > 100 && upperBodyModelMaskImage.length > 100
+  )
+  
+  const hasValidFullBodyModel = debugMode || (
+    fullBodyModelImage.length > 100 && fullBodyModelMaskImage.length > 100
+  )
+  
+  const hasValidBodyModels = debugMode || (
+    hasValidUpperBodyModel && hasValidFullBodyModel
+  )
+
   return {
     defaultSettings,
     
@@ -253,5 +276,14 @@ export function useSettings() {
 
     // trigger to save the options
     saveSettings,
+
+    debugMode,
+
+    hasValidDefaultCredentials,
+    hasValidCustomGradioApiCredentials,
+    hasValidReplicateCredentials,
+    hasValidCredentials,
+    hasValidUpperBodyModel,
+    hasValidBodyModels,
   }
 }

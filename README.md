@@ -70,15 +70,28 @@ Regardless of the provider, please verify your payment capacity and only spend w
 
 #### Deploy to Hugging Face
 
-First install [grog](https://github.com/multimodalart/grog), then follow grog's README.md instructions:
+First install [grog](https://github.com/multimodalart/grog), then follow grog's README.md instructions.
+
+To deploy the backend you will need two servers:
+
+##### Segmentation server
+
+A segmentation server (only necessary whenever you want to add a new picture).
+You can stop this server from running whenever you are done with preparing your pictures.
 
 ```
-python grog.py --replicate_model_id viktorfa/oot_diffusion_with_mask --run_type huggingface_spaces --huggingface_token YOUR_OWN_HUGGINGFACE_TOKEN --space_hardware a10g-small
+python grog.py --replicate_model_id jbilcke/oot_diffusion_with_mask --run_type huggingface_spaces --huggingface_token YOUR_OWN_HUGGINGFACE_TOKEN --space_hardware a10g-small
+```
 
+##### Substitution server
+
+Then you need the actual substitution server, which does the image substitution job.
+Be careful of costs! You are strongly recommended to stop the server once you do not use it anymore.
+
+```
 python grog.py --replicate_model_id viktorfa/oot_segmentation --run_type huggingface_spaces --huggingface_token YOUR_OWN_HUGGINGFACE_TOKEN --space_hardware a10g-small
 ```
 
-Be careful of costs! You are strongly recommended to stop the server once you do not use it anymore.
 
 #### Deploy to Replicate
 

@@ -1,5 +1,5 @@
 import { ImageReplacer, ImageSegmenter, PredictionReplaceImageWithReplicate, Settings } from "@/types"
-import { sleep } from "@/utils"
+import { generateSeed, sleep } from "@/utils"
 import { getDefaultSettings } from "@/utils/getDefaultSettings"
 
 
@@ -99,7 +99,7 @@ export const segmentImage: ImageSegmenter = async (modelImage) => {
   } while (true)
 }
 
-export const replaceImage: ImageReplacer = async ({ garmentImage, modelImage }) => {
+export const replaceImage: ImageReplacer = async (garmentImage) => {
   const settings = await chrome.storage.local.get(getDefaultSettings()) as Settings
 
   if (settings.engine !== "REPLICATE") {
@@ -110,8 +110,14 @@ export const replaceImage: ImageReplacer = async ({ garmentImage, modelImage }) 
     throw new Error(`replaceImage(): the garmentImage appears invalid`)
   }
 
+  const modelImage = settings.upperBodyModelImage
   if (!modelImage) {
     throw new Error(`replaceImage(): the modelImage appears invalid`)
+  }
+
+  const modelMaskImage = settings.upperBodyModelMaskImage
+  if (!modelMaskImage) {
+    throw new Error(`replaceImage(): the modelMaskImage appears invalid`)
   }
 
   if (!settings.replicateApiKey) {
@@ -143,11 +149,12 @@ export const replaceImage: ImageReplacer = async ({ garmentImage, modelImage }) 
     body: JSON.stringify({
       version: settings.replicateSubstitutionModel,
       input: {
-        seed: 0, // or generateSeed()
-        steps: settings.replicateNumberOfSteps,
         model_image: modelImage,
         garment_image: garmentImage,
-        guidance_scale: settings.replicateGuidanceScale
+        person_mask: modelMaskImage,
+        steps: settings.replicateNumberOfSteps,
+        guidance_scale: settings.replicateGuidanceScale,
+        seed: generateSeed()
       },
     }),
   });
