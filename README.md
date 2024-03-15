@@ -1,15 +1,15 @@
 # Atryon
 
-Atryon ("a-try-on") is a free Chrome extension to try any clothes you see online on a picture of yourself.
+Atryon (pronounced "a-try-on", the name comes from "AI Try On") is a free Chrome extension to see yourself wearing the various clothes you see on e-commerce websites.
 
 ## Usage recommendations
 
 ### Recommendations for the model
 
-The plugin works by identify pictures of clothes in the page (the "garment" pictures
+The plugin works by identifying pictures of clothes in the page (the "garment" pictures
 and replace them with your own photo (the "model" picture).
 
-Please only use a picture if yourself as model.
+Please only use a picture of yourself as model.
 
 ### Recommendations for the model model
 
