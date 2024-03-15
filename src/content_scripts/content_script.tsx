@@ -1,7 +1,6 @@
 import { urlMightBeInvalid } from "@/heuristics/urlMightBeInvalid"
 import { WorkerMessage, ImageURL } from "@/types"
 import { downloadImageToBase64 } from "@/utils/downloadImageToBase64"
-import { elementIsVisible } from "@/utils/elementIsVisible"
 import { getImageDimension } from "@/utils/getImageDimension"
 import { getVisibleImages } from "@/utils/getVisibleImages"
 
@@ -13,9 +12,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   const message = JSON.parse(JSON.stringify(msg))
   const action = `${message.action || "UNKNOWN"}` as WorkerMessage
 
-  console.log(`content_script.tsx: action: ${action}`)
+  // console.log(`content_script.tsx: action: ${action}`)
 
-    const fn = async () => {
+  const fn = async () => {
 
     if (action === "SCAN_IMAGES") {
         
@@ -23,9 +22,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
       try {
 
-        console.log(`ON SCAN_IMAGES..`)
+
         // main job: to regularly update the currentImages object
         const visibleImages = getVisibleImages()
+        console.log(`Found ${visibleImages.length} visible images:`, visibleImages)
 
         for (let element of visibleImages) {
           const originalUri = element.src || ""
@@ -102,14 +102,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         }
 
       } catch (err) {
-        console.error(`failed to scan the images!`, err)
+        console.error(`failed to scan the images:`, err)
       }
 
-      console.log("returning an ImageURL array fo good images:", goodImages)
+      console.log(`Found ${goodImages.length} good candidates:`, goodImages)
       sendResponse(goodImages)
     } else if (action === "REPLACE_IMAGES") {
 
-      console.log("content_script.tsx: got action to replace the image..",  message.images)
+      console.log("Replacing images in the page with those:",  message.images)
       const index: Record<string, ImageURL> = {}
       const images = message.images as ImageURL[]
       for (let image of images) {
@@ -120,7 +120,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
       try {
 
-        console.log(`ON REPLACE_IMAGES..`)
         // note: here we replace images everywhere, even the invisible one
         // that's because the user might have scrolled within the page
         // while the request was running in the background
@@ -149,10 +148,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           }
         }
 
-        console.log(`replaced ${replacedImages.length} images`)
+        console.log(`Replaced ${replacedImages.length} images within the page`)
 
       } catch (err) {
-        console.error("failed to replace the image:", err)
+        console.error("failed to replace the images:", err)
       }
 
       sendResponse(true)

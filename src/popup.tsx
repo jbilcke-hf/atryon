@@ -122,15 +122,27 @@ function Popup() {
     state.current.nbProcessedImages = 0
     state.current.nbImagesToProcess = 1
 
-    const allIndexedImages = Object.values(state.current.images)
+    // note: since we are reading the values from an object,
+    // we want to sort them again
+    const allIndexedImages = Object.values(state.current.images).sort((a, b) => {
+      // calculates the total pixels of the image (width * height)
+      const totalPixelsA = a.width * a.height;
+      const totalPixelsB = b.width * b.height;
+
+      // sort in descending order
+      return totalPixelsB - totalPixelsA;
+    });
     
-    const unprocessedImages = allIndexedImages.filter(image => image.status === "unprocessed")
+    const unprocessedImages = allIndexedImages.filter(image =>
+      image.status === "unprocessed"
+    )
 
     console.log("debug:", {
       "state.current.images:": state.current.images,
       allIndexedImages,
       unprocessedImages,
     })
+    
     for (let image of unprocessedImages) {
       
       // console.log(`asking API to replace this b64 image ${image.dataUri.slice(0, 60)}.. (${image.originalUri})`)
@@ -165,7 +177,8 @@ function Popup() {
       await sleep(3000)
 
       if (nbRequests++ >= maxNbRequests) {
-        console.log("reached the max number of requests")
+        console.log("reached the max number of images.. self-stopping")
+        settings.setEnabled(false)
         break
       }
     }
@@ -200,7 +213,7 @@ function Popup() {
     clearInterval(state.current.progressInterval)
     
     if (settings.isEnabled) {
-    // we reset the counters
+      // we reset the counters
       state.current.nbProcessedImages = 0
       state.current.nbImagesToProcess = 0
     
@@ -245,6 +258,14 @@ function Popup() {
         // it is expect that this progress bar gets stuck from tiem to time if the server is busy
         const finalProgress = Math.max(0, Math.min(maxProgress, coarseProgress + fineProgress))
         
+        console.log(`updating progress:`, {
+          coarseProgress,
+          coarseResolution,
+          expectedTimeSpentOnCurrentImageInMs,
+          timeSpentOnCurrentImageInMs,
+          fineProgress,
+          finalProgress,
+        })
         setCircularProgressConfig({
           ...initialCircularProgressConfig,
           id: 0, // we indicate which component we want to change

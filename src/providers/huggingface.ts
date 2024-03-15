@@ -94,7 +94,8 @@ export const replaceImage: ImageReplacer = async (garmentImage) => {
     throw new Error(`the returned image was empty`)
   }
   // console.log(`replaceImage:(): data = `, data)
-  return data as string[]
+  // we make sure to return only the strings
+  return (data.filter(x => typeof x === "string" && x.length > 30)) as string[]
 }
 
 export const segmentImage: ImageSegmenter = async (modelImage) => {

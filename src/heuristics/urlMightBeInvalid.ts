@@ -7,6 +7,7 @@ const wrongKeywords = [
   "Newsletter",
   "Bannière",
   "Paypal",
+  "shop-by-data.jpg",
 ].map(x => x.trim().toLowerCase())
 
 /**
