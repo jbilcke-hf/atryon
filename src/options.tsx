@@ -43,8 +43,11 @@ function Options() {
             <Select
               onValueChange={(value: string) => {
                 settings.setEngine(value as Engine)
+                settings.saveSettings()
               }}
-              defaultValue={settings.engine}>
+              defaultValue={settings.engine}
+              
+              value={settings.engine}>
               <SelectTrigger className="">
                 <SelectValue placeholder="Engine" />
               </SelectTrigger>
