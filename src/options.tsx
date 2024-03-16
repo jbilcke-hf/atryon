@@ -50,8 +50,8 @@ function Options() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="DEFAULT">Hugging Face Cloud (default, free for Hugging Face users 🤗)</SelectItem>
-                <SelectItem value="GRADIO_API">Custom&sol;local Gradio server (need a GPU or your own server)</SelectItem>
-                <SelectItem value="REPLICATE">Replicate.com (uses your Replicate account for billing)</SelectItem>
+                <SelectItem value="GRADIO_API">Custom/local Gradio server (you need a GPU or your own server)</SelectItem>
+                <SelectItem value="REPLICATE">Replicate.com (will use your Replicate account for billing)</SelectItem>
               </SelectContent>
             </Select>
           </Field>
@@ -72,6 +72,7 @@ function Options() {
           </>}
 
           {settings.engine === "REPLICATE" && <>
+            <p className="text-base">Note: it makes takes a few minutes for Replicate to warm-up the models if they haven't been used by in a while. So if segmentation or susbstitution fail, try again after 5 min.</p>
             <Field>
               <Label>Replicate API Token:</Label>
               <Input
