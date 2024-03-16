@@ -50,7 +50,8 @@ function Options() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="DEFAULT">Hugging Face Cloud (default, free for Hugging Face users 🤗)</SelectItem>
-                <SelectItem value="GRADIO_API">Custom or local Gradio server</SelectItem>
+                <SelectItem value="GRADIO_API">Custom&sol;local Gradio server (need a GPU or your own server)</SelectItem>
+                <SelectItem value="REPLICATE">Replicate.com (uses your Replicate account for billing)</SelectItem>
               </SelectContent>
             </Select>
           </Field>

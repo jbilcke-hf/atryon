@@ -140,6 +140,6 @@ export type Settings = {
   fullBodyModelImage: string
   fullBodyModelMaskImage: string
 
-  // to enable or disable the substitution
-  isEnabled: boolean
+  // DEPRECATED to enable or disable the substitution
+  // isEnabled: boolean
 }

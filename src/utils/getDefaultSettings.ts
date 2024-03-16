@@ -66,7 +66,7 @@ export function getDefaultSettings(): Settings {
     fullBodyModelImage: "",
     fullBodyModelMaskImage: "",
 
-    // to enable or disable the substitution
-    isEnabled: false,
+    // DEPRECATED: to enable or disable the substitution
+    // isEnabled: false,
   }
 }

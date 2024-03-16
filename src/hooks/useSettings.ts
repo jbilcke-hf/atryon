@@ -70,8 +70,8 @@ export function useSettings() {
   const [fullBodyModelImage, setFullBodyModelImage] = useState<string>(defaultSettings.fullBodyModelImage)
   const [fullBodyModelMaskImage, setFullBodyModelMaskImage] = useState<string>(defaultSettings.fullBodyModelMaskImage)
 
-  // to enable or disable the substitution
-  const [isEnabled, setEnabled] = useState<boolean>(defaultSettings.isEnabled)
+  // DEPRECATED to enable or disable the substitution
+  // const [isEnabled, setEnabled] = useState<boolean>(defaultSettings.isEnabled)
 
   useEffect(() => {
     // Restores state using the preferences stored in chrome.storage.
@@ -105,7 +105,8 @@ export function useSettings() {
         setFullBodyModelImage(settings.fullBodyModelImage)
         setFullBodyModelMaskImage(settings.fullBodyModelMaskImage)
 
-        setEnabled(settings.isEnabled)
+        // DEPRECATED
+        // setEnabled(settings.isEnabled)
       }
     )
   }, [])
@@ -142,7 +143,8 @@ export function useSettings() {
         fullBodyModelImage,
         fullBodyModelMaskImage,
 
-        isEnabled,
+        // DEPRECATED
+        // isEnabled,
       },
       () => {
         // Update status to let user know options were saved.
@@ -183,7 +185,9 @@ export function useSettings() {
     upperBodyModelMaskImage,
     fullBodyModelImage,
     fullBodyModelMaskImage,
-    isEnabled,
+
+    // DEPRECATED
+    // isEnabled,
   ])
 
   // set to true to disable validation
@@ -274,8 +278,8 @@ export function useSettings() {
     fullBodyModelImage, setFullBodyModelImage,
     fullBodyModelMaskImage, setFullBodyModelMaskImage,
 
-    // to enable or disable the substitution
-    isEnabled, setEnabled,
+    // DEPRECATED to enable or disable the substitution
+    // isEnabled, setEnabled,
 
     // trigger to save the options
     saveSettings,

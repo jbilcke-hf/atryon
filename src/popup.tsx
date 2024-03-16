@@ -29,8 +29,10 @@ function Popup() {
 
   const settings = useSettings()
 
+  const [isEnabled, setEnabled] = useState(false)
+
   const state = useRef<{
-    isActive: boolean
+    isEnabled: boolean
     isScanningImages: boolean
     isProcessingImages: boolean
     isReplacingImages: boolean
@@ -43,7 +45,7 @@ function Popup() {
     pageProcessingEndedAt: number
     progressInterval?: NodeJS.Timeout
   }>({
-    isActive: false,
+    isEnabled: false,
     isScanningImages: false,
     isProcessingImages: false,
     isReplacingImages: false,
@@ -178,7 +180,7 @@ function Popup() {
 
       if (nbRequests++ >= maxNbRequests) {
         console.log("reached the max number of images.. self-stopping")
-        settings.setEnabled(false)
+        setEnabled(false)
         break
       }
     }
@@ -193,18 +195,18 @@ function Popup() {
     }
 
     // finally, we try to scan the page again for any new image
-    if (state.current.isActive) {
+    if (state.current.isEnabled) {
       setTimeout(async () => {
         await mainLoop()
       }, 4000)
     }
   }
   useEffect(() => {
-    if (settings.isEnabled && !state.current.isActive) {
-      state.current.isActive = true
+    if (isEnabled && !state.current.isEnabled) {
+      state.current.isEnabled = true
       mainLoop()
-    } else if (!settings.isEnabled && state.current.isActive) {
-      state.current.isActive = false
+    } else if (!isEnabled && state.current.isEnabled) {
+      state.current.isEnabled = false
     }
   }, [JSON.stringify(settings)])
 
@@ -212,7 +214,7 @@ function Popup() {
     // we do a bit of reset
     clearInterval(state.current.progressInterval)
     
-    if (settings.isEnabled) {
+    if (isEnabled) {
       // we reset the counters
       state.current.nbProcessedImages = 0
       state.current.nbImagesToProcess = 0
@@ -269,6 +271,8 @@ function Popup() {
         // it is expect that this progress bar gets stuck from tiem to time if the server is busy
         const finalProgress = Math.max(0, Math.min(maxProgress, coarseProgress + fineProgress))
         
+        // uncomment during development if you need to investigate
+        /*
         console.log(`updating progress:`, {
           coarseProgress,
           coarseResolution,
@@ -277,16 +281,18 @@ function Popup() {
           fineProgress,
           finalProgress,
         })
+        */
+
         setCircularProgressConfig({
           ...initialCircularProgressConfig,
           id: 0, // we indicate which component we want to change
           percent: finalProgress
         });
-      }, 1000);
+      }, 500);
     }
 
     return () => clearInterval(state.current.progressInterval);
-  }, [settings.isEnabled]);
+  }, [isEnabled]);
 
   return (
     <div className={cn(
@@ -308,8 +314,8 @@ function Popup() {
               `rounded-full`,
               `w-36 h-36`
             )}
-            onClick={() => settings.setEnabled(!settings.isEnabled)}>
-            <div className="text-lg font-semibold">{settings.isEnabled ? "Stop" : "Start"}</div>
+            onClick={() => setEnabled(!isEnabled)}>
+            <div className="text-lg font-semibold">{isEnabled ? "Stop" : "Start"}</div>
             <div className="text-lg font-semibold">{
               Math.round(circularProgressConfig.percent || 0)
             }%</div>
