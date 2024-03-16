@@ -203,13 +203,16 @@ function Options() {
                 <p>Your upper body</p>
               </div>}
 
-              {settings.upperBodyModelMaskImage && <div className="flex flex-col items-center">
-                <img
+              {settings.upperBodyModelMaskImage ? <div className="flex flex-col items-center">
+                 <img
                   src={settings.upperBodyModelMaskImage}
                   className="w-full h-auto my-4 rounded-xl overflow-hidden"
                 />
                 <p>Body mask</p>
-              </div>}
+              </div>
+              : <div className="w-full h-auto flex flex-col items-center justify-center">
+                {settings.upperBodyModelMaskImage ? "Segmenting image, please wait.." : "Please select a file"}
+             </div>}
             </div>
 
             <Input
@@ -252,12 +255,15 @@ function Options() {
                 />
                 <p>Your full body</p>
               </div>}
-              {settings.fullBodyModelMaskImage && <div className="flex flex-col items-center">
+              {settings.fullBodyModelMaskImage ? <div className="flex flex-col items-center">
                 <img
                   src={settings.fullBodyModelMaskImage}
                   className="w-full h-auto my-4 rounded-xl overflow-hidden"
                 />
                 <p>Body mask</p>
+              </div>
+              : <div className="w-full h-autoflex flex-col items-center justify-center">
+                {settings.fullBodyModelImage ? "Segmenting image, please wait.." : "Please select a file"}
               </div>}
             </div>
             <Input
