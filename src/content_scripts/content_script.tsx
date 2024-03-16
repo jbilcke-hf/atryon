@@ -49,8 +49,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           // so we want to actually re-download the original
           try {
 
-            // TODO: maybe we should look into the src set, for an even higher resolution?
-            const bestImageSrc = element.currentSrc || element.src || ""
+            // we try to first the "best" hi-res image
+            // dataset?.oldRes is for Amazon, otherwise we use currentSrc
+            // TODO we should look into the srcset, for an even higher resolution
+            const hiResImageSrc = element.dataset?.oldHires || element.currentSrc
+
+            const bestImageSrc = hiResImageSrc || element.src || ""
 
             dataUri = await downloadImageToBase64(bestImageSrc)
           } catch (err) {

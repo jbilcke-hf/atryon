@@ -187,7 +187,7 @@ function Options() {
             <li><span className="text-2xl">👕</span> Wear simple clothes (eg. white t-shirt, trousers)</li>
             <li><span className="text-2xl">🧍</span> Face the camera, with arms hanging on the sides</li>
             <li><span className="text-2xl">💡</span> Use a well lit environment, with a neutral background</li>
-            <li><span className="text-2xl">📸</span> The image resolution should be at least 1024px</li>
+            <li><span className="text-2xl">📸</span> Use a portrait orientation (beware of hidden photo settings!)</li>
           </ul>
 
           {/*

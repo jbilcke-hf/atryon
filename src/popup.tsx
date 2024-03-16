@@ -257,7 +257,7 @@ function Popup() {
         
         // FINE ESTIMATOR
         // each image should take ~20 seconds with normal server usage
-        const expectedTimeSpentOnCurrentImageInMs = 20 * 1000
+        const expectedTimeSpentOnCurrentImageInMs = 30 * 1000
 
         const timeSpentOnCurrentImageInMs = Date.now() - state.current.currentImageProcessingStartedAt 
 
@@ -311,7 +311,7 @@ function Popup() {
             onClick={() => settings.setEnabled(!settings.isEnabled)}>
             <div className="text-lg font-semibold">{settings.isEnabled ? "Stop" : "Start"}</div>
             <div className="text-lg font-semibold">{
-              circularProgressConfig.percent || 0
+              Math.round(circularProgressConfig.percent || 0)
             }%</div>
           </div>
         </CircularProgressBar>
